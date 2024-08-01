@@ -1,26 +1,15 @@
-CRYSTAL_BIN ?= $(shell which crystal)
-SERVE_BIN ?= $(shell which crystalctags)
-PREFIX ?= /usr/local
-
 all: clean build
 
-build:
-	$(CRYSTAL_BIN) deps
-	$(CRYSTAL_BIN) build --release -o bin/crystalctags src/crystal_ctags/bootstrap.cr $(CRFLAGS)
+build: $(wildcard src/**/*)
+	shards install
+	shards build crystal-ctags
 
 clean:
-	rm -f ./bin/crystalctags
+	rm -f ./bin/crystal-ctags
 
 test:
-	$(CRYSTAL_BIN) spec --verbose
+	crystal spec --verbose
 
 spec: test
 
-install: build
-	mkdir -p $(PREFIX)/bin
-	cp ./bin/crystalctags $(PREFIX)/bin
-
-reinstall: build
-	cp -rf ./bin/crystalctags $(SERVE_BIN)
-
-.PHONY: all build clean test spec install reinstall
+.PHONY: all build clean test spec

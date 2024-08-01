@@ -29,7 +29,7 @@ module CrystalCtags
     def to_s(io)
       io << @name << "\t" << @filename << "\t" << @regex << ";\"\t" << TAGS[@kind]
       io << "\tline:" << @line unless @line.nil?
-      io << "\tnamespace:" << @scope.not_nil!.join(".") unless @scope.not_nil!.empty?
+      io << "\tnamespace:" << @scope.try &.join(".") unless @scope.try &.empty?
       io << "\tsignature:" << @signature unless @signature.nil?
       io << "\ttype:" << @type unless @type.nil?
     end
@@ -69,7 +69,7 @@ module CrystalCtags
 
     def visit(node : Crystal::Def)
       first_line = node.to_s.lines.first
-      start_args = first_line.index(node.name).not_nil! + node.name.size
+      start_args = first_line.index!(node.name) + node.name.size
       signature = first_line[start_args..-1].rstrip
       signature = nil if signature.size == 0
 
@@ -83,8 +83,8 @@ module CrystalCtags
     end
 
     def visit(node : Crystal::LibDef)
-      process_node node, node.name, :lib
-      @scope << node.name
+      process_node node, node.name.to_s, :lib
+      @scope << node.name.to_s
       true
     end
 
