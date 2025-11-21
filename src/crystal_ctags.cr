@@ -130,6 +130,19 @@ module CrystalCtags
     end
 
     def relativize(filename)
+      # Handle absolute paths that don't start with current directory
+      if filename.starts_with?("/")
+        # Convert absolute path to be relative to current working directory
+        begin
+          path = Path.new(filename).relative_to(Path.new(Dir.current))
+          return path.to_s
+        rescue
+          # If relative_to fails, try to extract just the basename
+          return File.basename(filename)
+        end
+      end
+
+      # Handle relative paths
       if filename.starts_with?(Dir.current)
         filename = filename[Dir.current.size..-1]
         filename = filename[1..-1] if filename.starts_with?("/")
