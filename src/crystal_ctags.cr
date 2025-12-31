@@ -186,9 +186,10 @@ module CrystalCtags
 
     def to_s(io)
       # Headers
-      io << "!_TAG_FILE_FORMAT 2 /extended format; --format=1 will not append ;\" to lines/\n"
-      io << "!_TAG_FILE_SORTED 0 /0=unsorted, 1=sorted, 2=foldcase/\n"
-      io << "!_TAG_PROGRAM_VERSION #{CrystalCtags::VERSION} //\n"
+      io << "!_TAG_FILE_FORMAT\t2\t/extended format; --format=1 will not append ;\" to lines/\n"
+      io << "!_TAG_FILE_SORTED\t0\t/0=unsorted, 1=sorted, 2=foldcase/\n"
+      io << "!_TAG_PROGRAM_VERSION\t#{CrystalCtags::VERSION}\t//\n"
+      io << "!_TAG_PROC_CWD\t#{Dir.current}\t//\n"
 
       # Tags
       @tags.each do |tag|
