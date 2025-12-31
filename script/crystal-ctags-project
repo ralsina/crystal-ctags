@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -e
+
+if ! command -v readtags &>/dev/null; then
+    echo "No readtags command, install it use package name \`ctags'
+e.g. For Arch linux, \`pacman -S ctags'
+"
+    exit 1
+fi
+
+ROOT="$(pwd -P)"
+
+rm -f CTAGS.raw CTAGS
+
+if command -v fd &>/dev/null; then
+    FILES=$(fd -I -tf -ecr -Espec . src lib)
+else
+    FILES=$(find src lib -type f -name '*.cr' ! -path '*/spec/*')
+fi
+
+[ -n "$FILES" ] || { echo "No .cr files found" >&2; exit 1; }
+
+for file in $FILES; do
+    crystal-ctags "$file" \
+        | grep -v '^!_TAG_' \
+        | sed '/^[[:space:]]*$/d' \
+              >> CTAGS.raw
+done
+
+{
+    printf '%s\t%s\t%s\n' '!_TAG_FILE_FORMAT' '2' '/extended format; --format=1 will not append ;" to lines/'
+    printf '%s\t%s\t%s\n' '!_TAG_FILE_SORTED' '1' '/0=unsorted, 1=sorted, 2=foldcase/'
+    printf '%s\t%s\t%s\n' '!_TAG_PROGRAM_VERSION' '0.1.0' '//'
+    printf '%s\t%s\t%s\n' '!_TAG_PROC_CWD' "$ROOT" '//'
+
+    TAB="$(printf '\t')"
+    LC_ALL=C sort -t "$TAB" -k1,1 -k2,2 CTAGS.raw
+} > CTAGS
+
+rm -f CTAGS.raw
+
+echo "OK: wrote ./CTAGS (sorted by tag name)"
