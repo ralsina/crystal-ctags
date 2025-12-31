@@ -27,7 +27,7 @@ module CrystalCtags
     end
 
     def to_s(io)
-      io << @name << "\t" << @filename << "\t" << @regex << ";\"\t" << TAGS[@kind]
+      io << @name << "\t" << @filename << "\t/" << @regex << "/;\"\t" << TAGS[@kind]
       io << "\tline:" << @line unless @line.nil?
       io << "\tnamespace:" << @scope.try &.join(".") unless @scope.try &.empty?
       io << "\tsignature:" << @signature unless @signature.nil?
