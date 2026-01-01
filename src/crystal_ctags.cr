@@ -161,14 +161,10 @@ module CrystalCtags
     getter tags
 
     def initialize(filenames)
-      @files = {} of String => String
       @tags = [] of CrystalCtags::Tag
 
       filenames.each do |filename|
-        @files[filename] = File.read(File.expand_path(filename))
-      end
-
-      @files.each do |filename, content|
+        content = File.read(File.expand_path(filename))
         visitor = CrystalCtags::CtagsVisitor.new(filename, content)
         parser = Crystal::Parser.new(content)
         parser.filename = filename
