@@ -34,7 +34,7 @@ $ crystal-ctags foo.cr > CTAGS
 
 ```sh
 $ cd my_project
-$ crystal-ctags-project # will create sorted CTAGS here
+$ crystal-ctags --project # create sorted CTAGS for project
 ```
 
 
