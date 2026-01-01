@@ -183,7 +183,7 @@ module CrystalCtags
       io << "!_TAG_PROC_CWD\t#{Dir.current}\t//\n"
 
       # Tags
-      @tags.sort_by { |tag| [tag.name, tag.filename] }.each {|tag| io << tag << "\n" }
+      @tags.sort_by { |tag| [tag.name, tag.filename] }.uniq!.each {|tag| io << tag << "\n" }
     end
   end
 end

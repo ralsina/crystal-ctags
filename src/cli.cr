@@ -80,9 +80,9 @@ end
 if project_mode
   STDERR.puts "Indexing project files (patterns: #{default_pattern.join(", ")})."
 
-  files = Dir.glob(default_pattern).uniq!
+  files = Dir.glob(default_pattern)
 
-  abort "error: no files matched: #{default_pattern.join(", ")}" if files.empty?
+  abort "error: no files matched: #{default_pattern.join(", ")}", 2 if files.empty?
 
   write_to_file(output_path, files)
 else
