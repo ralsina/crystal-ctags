@@ -12,12 +12,27 @@ Create a sorted CTAGS for the Crystal programming language compatible with unive
 USAGE
 
 filenames = ARGV
-default_pattern = ["src/**/*.cr", "lib/**/*.cr"]
+default_pattern = ["src/**/*.cr", "spec/**/*.cr", "lib/**/*.cr"]
 project = false
 tag_name = "./CTAGS"
 
 OptionParser.parse do |parser|
   parser.banner = usage
+
+  parser.on("-p PATTERN", "--pattern=PATTERN", "Specify the file pattern used to create the CTAGS index.
+e.g. --pattern='[\"src/**/*.cr\", \"spec/**/*.cr\"]'
+Specifying this option implicitly includes --project.") do |pattern|
+    default_pattern = pattern
+    project = true
+  end
+
+  parser.on("-o tagfile", "--output=TAGFILE", "TAG file name, , default: #{tag_name}") do |name|
+    tag_name = name
+  end
+
+  parser.on("--project", "Generate CTAGS for current project, default: #{default_pattern}") do
+    project = true
+  end
 
   parser.on("-h", "--help", "Show this help message and exit") do
     puts parser
@@ -27,23 +42,6 @@ OptionParser.parse do |parser|
   parser.on("-v", "--version", "Show version") do
     puts CrystalCtags::VERSION
     exit
-  end
-
-  parser.on("-p PATTERN", "--pattern=PATTERN", "Specify the file pattern used to create the CTAGS index.
-e.g. --pattern='[\"src/**/*.cr\", \"spec/**/*.cr\"]'
-
-Specifying this option implicitly includes --project.
-") do |pattern|
-    default_pattern = pattern
-    project = true
-  end
-
-  parser.on("--project", "Generate CTAGS for current project, default pattern: #{default_pattern}") do
-    project = true
-  end
-
-  parser.on("-o tagfile", "--output=TAGFILE", "TAG file name, , default: #{tag_name}") do |name|
-    tag_name = name
   end
 
   parser.invalid_option do |flag|
