@@ -1,5 +1,4 @@
 require "option_parser"
-require "json"
 require "./crystal_ctags"
 require "./crystal_ctags/version"
 
@@ -14,16 +13,17 @@ USAGE
 filenames = ARGV
 default_pattern = ["src/**/*.cr", "spec/**/*.cr", "lib/**/*.cr"]
 reset_default_pattern = false
-project = false
+project_mode = false
 tag_name = "./CTAGS"
-new_tag_name = false
+specify_new_tag_name = false
 
 OptionParser.parse do |parser|
   parser.banner = usage
 
   parser.on("-p PATTERN", "--pattern=PATTERN", "Specify the glob pattern (can be repeated) used to create the CTAGS index.
 e.g. --pattern=\"src/**/*.cr\" --pattern \"spec/**/*.cr\"
-Specifying this option implicitly includes --project.") do |pattern|
+Specifying this option implicitly includes --project.
+") do |pattern|
     if reset_default_pattern == false
       reset_default_pattern = true
       default_pattern = [] of String
@@ -31,16 +31,19 @@ Specifying this option implicitly includes --project.") do |pattern|
 
     default_pattern << pattern
 
-    project = true
+    project_mode = true
   end
 
-  parser.on("-o tagfile", "--output=TAGFILE", "TAG file name, default: #{tag_name}") do |name|
+  parser.on("-o tagfile", "--output=TAGFILE", "TAG file name if create CTAGS for project, default: #{tag_name}
+") do |name|
     tag_name = name
-    new_tag_name = true
+    specify_new_tag_name = true
   end
 
-  parser.on("--project", "Generate CTAGS for current project, default: #{default_pattern}") do
-    project = true
+  parser.on("--project", "Generate CTAGS for project, default pattern: #{default_pattern},
+Without this option, will output CTAGS to STDOUT.
+") do
+    project_mode = true
   end
 
   parser.on("-h", "--help", "Show this help message and exit") do
@@ -66,19 +69,25 @@ Specifying this option implicitly includes --project.") do |pattern|
   end
 end
 
-if project
+def write_to_file(tag_name, pattern)
+  File.write(tag_name, CrystalCtags::Ctags.new(pattern))
+
+  STDERR.puts "OK: wrote #{tag_name} (sorted by tag name)"
+end
+
+if project_mode
   STDERR.puts "Writing #{tag_name} for current project use pattern: #{default_pattern}"
 
   filenames = Dir.glob(default_pattern)
 
   abort "Can't found file result use #{default_pattern}" if filenames.empty?
 
-  File.write(tag_name, CrystalCtags::Ctags.new(filenames))
+  write_to_file(tag_name, filenames)
 else
   abort "Can't found file result use #{ARGV}" if ARGV.empty?
 
-  if new_tag_name
-    File.write(tag_name, CrystalCtags::Ctags.new(ARGV))
+  if specify_new_tag_name
+    write_to_file(tag_name, ARGV)
   else
     puts CrystalCtags::Ctags.new(ARGV)
   end
