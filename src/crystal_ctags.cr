@@ -14,8 +14,7 @@ module CrystalCtags
   }
 
   class Tag
-    @name : String
-    @filename : String
+    getter name : String, filename : String
     @regex : String
     @kind : Symbol
     @line : Int32?
@@ -165,12 +164,8 @@ module CrystalCtags
       @files = {} of String => String
       @tags = [] of CrystalCtags::Tag
 
-      filenames.map! do |filename|
-        File.expand_path(filename)
-      end
       filenames.each do |filename|
-        content = File.read(filename)
-        @files[filename] = content
+        @files[filename] = File.read(File.expand_path(filename))
       end
 
       @files.each do |filename, content|
@@ -187,14 +182,12 @@ module CrystalCtags
     def to_s(io)
       # Headers
       io << "!_TAG_FILE_FORMAT\t2\t/extended format; --format=1 will not append ;\" to lines/\n"
-      io << "!_TAG_FILE_SORTED\t0\t/0=unsorted, 1=sorted, 2=foldcase/\n"
+      io << "!_TAG_FILE_SORTED\t1\t/0=unsorted, 1=sorted, 2=foldcase/\n"
       io << "!_TAG_PROGRAM_VERSION\t#{CrystalCtags::VERSION}\t//\n"
       io << "!_TAG_PROC_CWD\t#{Dir.current}\t//\n"
 
       # Tags
-      @tags.each do |tag|
-        io << tag << "\n"
-      end
+      @tags.sort_by { |tag| [tag.name, tag.filename] }.each {|tag| io << tag << "\n" }
     end
   end
 end
