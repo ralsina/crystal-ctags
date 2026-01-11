@@ -29,7 +29,12 @@ $ sudo make reinstall
 ## Usage
 
 ```sh
-$ crystalctags -h
+$ crystal-ctags foo.cr > CTAGS
+```
+
+```sh
+$ cd my_project
+$ crystal-ctags --project # create sorted CTAGS for project
 ```
 
 

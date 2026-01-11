@@ -3,7 +3,7 @@ version: 0.1.0
 
 targets:
   crystal-ctags:
-    main: src/crystal_ctags/bootstrap.cr
+    main: src/cli.cr
 
 authors:
   - SuperPaintman <SuperPaintmanDeveloper@gmail.com>
