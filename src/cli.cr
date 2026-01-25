@@ -4,23 +4,23 @@ require "./crystal_ctags/version"
 
 ARGV << "--help" if ARGV.empty?
 
+output_path = "./tags"
+
 usage = <<-USAGE
 Usage:
   crystal-ctags [OPTIONS] [FILES...]
 
-Create a sorted CTAGS for the Crystal programming language compatible with universal-ctags.
+Create a sorted CTAGS(#{output_path}) for the Crystal programming language compatible with universal-ctags.
 
 USAGE
 
 default_pattern = ["src/**/*.cr", "spec/**/*.cr", "lib/**/*.cr"]
 reset_default_pattern = false
 project_mode = false
-output_path = "./CTAGS"
 output_specified = false
 
 OptionParser.parse do |parser|
   parser.banner = usage
-
 
   parser.on("-p PATTERN", "--pattern=PATTERN", "Specify the new glob pattern (may be repeated). Implies --project.
 Example: --pattern='src/**/*.cr' --pattern='spec/**/*.cr'
@@ -35,14 +35,13 @@ Example: --pattern='src/**/*.cr' --pattern='spec/**/*.cr'
     project_mode = true
   end
 
-
   parser.on("-o tagfile", "--output=TAGFILE", "Write output to TAGFILE (default: #{output_path}).
 ") do |name|
     output_path = name
     output_specified = true
   end
 
-  parser.on("--project", "Generate CTAGS for the current project (default pattern: #{default_pattern.join(", ")}),
+  parser.on("--project", "Generate CTAGS(#{output_path}) for the current project (default pattern: #{default_pattern.join(", ")}),
 Without --project, inputs are treated as explicit file paths and output goes to STDOUT.
 ") do
     project_mode = true
