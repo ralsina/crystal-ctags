@@ -1,4 +1,5 @@
 require "option_parser"
+require "colorize"
 require "./crystal_ctags"
 require "./crystal_ctags/version"
 
@@ -73,21 +74,21 @@ end
 def write_to_file(tag_name, pattern)
   File.write(tag_name, CrystalCtags::Ctags.new(pattern))
 
-  STDERR.puts "OK: wrote #{tag_name} (sorted by tag name)"
+  STDERR.puts "OK: wrote #{tag_name} (sorted by tag name)".colorize(:green)
 end
 
 if project_mode
-  STDERR.puts "Indexing project files (patterns: #{default_pattern.join(", ")})."
+  STDERR.puts "Indexing project files (patterns: #{default_pattern.join(", ")}) ..."
 
   files = Dir.glob(default_pattern)
 
-  abort "error: no files matched: #{default_pattern.join(", ")}", 2 if files.empty?
+  abort "error: no files matched: #{default_pattern.join(", ")}".colorize(:red), 2 if files.empty?
 
   write_to_file(output_path, files)
 else
   files = ARGV
 
-  abort "error: no input files." if files.empty?
+  abort "error: no input files.".colorize(:red), 2 if files.empty?
 
   if output_specified
     write_to_file(output_path, files)
