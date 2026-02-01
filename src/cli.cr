@@ -1,26 +1,27 @@
 require "option_parser"
+require "colorize"
 require "./crystal_ctags"
 require "./crystal_ctags/version"
 
 ARGV << "--help" if ARGV.empty?
 
+output_path = "./tags"
+
 usage = <<-USAGE
 Usage:
   crystal-ctags [OPTIONS] [FILES...]
 
-Create a sorted CTAGS for the Crystal programming language compatible with universal-ctags.
+Create a sorted CTAGS(#{output_path}) for the Crystal programming language compatible with universal-ctags.
 
 USAGE
 
 default_pattern = ["src/**/*.cr", "spec/**/*.cr", "lib/**/*.cr"]
 reset_default_pattern = false
 project_mode = false
-output_path = "./CTAGS"
 output_specified = false
 
 OptionParser.parse do |parser|
   parser.banner = usage
-
 
   parser.on("-p PATTERN", "--pattern=PATTERN", "Specify the new glob pattern (may be repeated). Implies --project.
 Example: --pattern='src/**/*.cr' --pattern='spec/**/*.cr'
@@ -35,14 +36,13 @@ Example: --pattern='src/**/*.cr' --pattern='spec/**/*.cr'
     project_mode = true
   end
 
-
   parser.on("-o tagfile", "--output=TAGFILE", "Write output to TAGFILE (default: #{output_path}).
 ") do |name|
     output_path = name
     output_specified = true
   end
 
-  parser.on("--project", "Generate CTAGS for the current project (default pattern: #{default_pattern.join(", ")}),
+  parser.on("--project", "Generate CTAGS(#{output_path}) for the current project (default pattern: #{default_pattern.join(", ")}),
 Without --project, inputs are treated as explicit file paths and output goes to STDOUT.
 ") do
     project_mode = true
@@ -74,21 +74,21 @@ end
 def write_to_file(tag_name, pattern)
   File.write(tag_name, CrystalCtags::Ctags.new(pattern))
 
-  STDERR.puts "OK: wrote #{tag_name} (sorted by tag name)"
+  STDERR.puts "OK: wrote #{tag_name} (sorted by tag name)".colorize(:green)
 end
 
 if project_mode
-  STDERR.puts "Indexing project files (patterns: #{default_pattern.join(", ")})."
+  STDERR.puts "Indexing project files (patterns: #{default_pattern.join(", ")}) ..."
 
   files = Dir.glob(default_pattern)
 
-  abort "error: no files matched: #{default_pattern.join(", ")}", 2 if files.empty?
+  abort "error: no files matched: #{default_pattern.join(", ")}".colorize(:red), 2 if files.empty?
 
   write_to_file(output_path, files)
 else
   files = ARGV
 
-  abort "error: no input files." if files.empty?
+  abort "error: no input files.".colorize(:red), 2 if files.empty?
 
   if output_specified
     write_to_file(output_path, files)
